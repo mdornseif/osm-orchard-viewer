@@ -85,14 +85,7 @@ function App() {
         onLayerChange={setCurrentLayer}
       />
 
-      <div className="fixed top-4 left-4 right-4 z-[1000] pointer-events-none">
-        <div className="bg-card/90 backdrop-blur-sm rounded-lg p-3 map-control-shadow">
-          <h1 className="text-lg font-semibold text-foreground">Mobile Map Viewer</h1>
-          <p className="text-sm text-muted-foreground">
-            Interactive maps with multiple tile sources
-          </p>
-        </div>
-      </div>
+
 
       <Toaster />
     </div>
