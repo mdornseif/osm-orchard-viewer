@@ -17,7 +17,6 @@ function App() {
   const [currentLayer, setCurrentLayer] = useKV('selected-layer', 'osm')
   const [mapCenter, setMapCenter] = useKV<[number, number]>('map-center', DEFAULT_CENTER)
   const [mapZoom, setMapZoom] = useKV<number>('map-zoom', DEFAULT_ZOOM)
-  const [showOrchards, setShowOrchards] = useKV('show-orchards', false)
   
   // Use refs to prevent stale closures
   const mapCenterRef = useRef(mapCenter)
@@ -120,11 +119,7 @@ function App() {
         onLayerChange={setCurrentLayer}
       />
 
-      <OrchardLayer
-        map={map}
-        visible={showOrchards}
-        onToggle={() => setShowOrchards(!showOrchards)}
-      />
+      <OrchardLayer map={map} />
 
       <Toaster />
     </div>

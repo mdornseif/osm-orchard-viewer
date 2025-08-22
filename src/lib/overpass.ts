@@ -75,33 +75,15 @@ export async function queryOrchards(bounds: L.LatLngBounds): Promise<OverpassEle
 }
 
 /**
- * Convert Overpass element to Leaflet polygon
+ * Convert Overpass element to Leaflet polygon or marker based on zoom level
  */
-export function elementToPolygon(element: OverpassElement): L.Polygon | null {
-  if (!element.geometry || element.geometry.length < 3) {
+export function elementToPolygon(element: OverpassElement, zoom: number): L.Polygon | L.Marker | null {
+  if (!element.geometry || element.geometry.length < 1) {
     return null
   }
 
   try {
-    const coordinates: [number, number][] = element.geometry.map(coord => [coord.lat, coord.lon])
-    
-    // Close the polygon if it's not already closed
-    const firstPoint = coordinates[0]
-    const lastPoint = coordinates[coordinates.length - 1]
-    if (firstPoint[0] !== lastPoint[0] || firstPoint[1] !== lastPoint[1]) {
-      coordinates.push(firstPoint)
-    }
-    
-    // Create polygon with orchard styling
-    const polygon = L.polygon(coordinates, {
-      fillColor: '#4ade80', // Green color for orchards
-      fillOpacity: 0.4,
-      color: '#16a34a',
-      weight: 2,
-      opacity: 0.8
-    })
-
-    // Add popup with information
+    // Create popup content
     const name = element.tags?.name || 'Obstgarten'
     const crop = element.tags?.crop || null
     const operator = element.tags?.operator || null
@@ -120,13 +102,61 @@ export function elementToPolygon(element: OverpassElement): L.Polygon | null {
     }
     
     popupContent += `<div class="text-xs text-gray-500 mt-2 border-t pt-1">OSM ID: ${element.id}</div>`
-    
-    polygon.bindPopup(popupContent, {
-      maxWidth: 250,
-      className: 'orchard-popup'
-    })
 
-    return polygon
+    // Above zoom level 16, show as points
+    if (zoom > 16) {
+      // Calculate center point of the orchard
+      const lats = element.geometry.map(coord => coord.lat)
+      const lons = element.geometry.map(coord => coord.lon)
+      const centerLat = lats.reduce((sum, lat) => sum + lat, 0) / lats.length
+      const centerLon = lons.reduce((sum, lon) => sum + lon, 0) / lons.length
+
+      const marker = L.marker([centerLat, centerLon], {
+        icon: L.divIcon({
+          html: `<div style="background: #ff6b35; width: 8px; height: 8px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 1px #ff6b35;"></div>`,
+          className: 'custom-orchard-marker',
+          iconSize: [12, 12],
+          iconAnchor: [6, 6]
+        })
+      })
+
+      marker.bindPopup(popupContent, {
+        maxWidth: 250,
+        className: 'orchard-popup'
+      })
+
+      return marker
+    } else {
+      // Show as polygon at lower zoom levels
+      if (element.geometry.length < 3) {
+        return null
+      }
+
+      const coordinates: [number, number][] = element.geometry.map(coord => [coord.lat, coord.lon])
+      
+      // Close the polygon if it's not already closed
+      const firstPoint = coordinates[0]
+      const lastPoint = coordinates[coordinates.length - 1]
+      if (firstPoint[0] !== lastPoint[0] || firstPoint[1] !== lastPoint[1]) {
+        coordinates.push(firstPoint)
+      }
+      
+      // Create polygon with bright orange styling
+      const polygon = L.polygon(coordinates, {
+        fillColor: '#ff6b35', // Bright orange color for orchards
+        fillOpacity: 0.4,
+        color: '#e55100',
+        weight: 2,
+        opacity: 0.8
+      })
+
+      polygon.bindPopup(popupContent, {
+        maxWidth: 250,
+        className: 'orchard-popup'
+      })
+
+      return polygon
+    }
   } catch (error) {
     console.error('Failed to create polygon from element:', error)
     return null

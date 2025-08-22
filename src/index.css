@@ -86,3 +86,13 @@ body {
 .orchard-popup .leaflet-popup-tip {
   background: oklch(0.98 0 0);
 }
+
+/* Custom styling for orchard point markers */
+.custom-orchard-marker {
+  transition: transform 0.2s ease;
+}
+
+.custom-orchard-marker:hover {
+  transform: scale(1.2);
+  z-index: 1000;
+}

@@ -7,16 +7,15 @@ import { toast } from 'sonner'
 
 interface OrchardLayerProps {
   map: L.Map | null
-  visible: boolean
-  onToggle: () => void
 }
 
-export function OrchardLayer({ map, visible, onToggle }: OrchardLayerProps) {
+export function OrchardLayer({ map }: OrchardLayerProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [orchardCount, setOrchardCount] = useState(0)
   const layerGroupRef = useRef<L.LayerGroup | null>(null)
   const lastBoundsRef = useRef<L.LatLngBounds | null>(null)
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const lastApiCallRef = useRef<number>(0)
 
   // Initialize layer group
   useEffect(() => {
@@ -42,7 +41,7 @@ export function OrchardLayer({ map, visible, onToggle }: OrchardLayerProps) {
 
   // Listen for map movement to reload orchards
   useEffect(() => {
-    if (!map || !visible) return
+    if (!map) return
 
     const handleMoveEnd = () => {
       const currentBounds = map.getBounds()
@@ -70,7 +69,7 @@ export function OrchardLayer({ map, visible, onToggle }: OrchardLayerProps) {
         clearTimeout(loadingTimeoutRef.current)
       }
     }
-  }, [map, visible])
+  }, [map])
 
   const boundsOverlapSignificantly = (bounds1: L.LatLngBounds, bounds2: L.LatLngBounds): boolean => {
     // Validate inputs
@@ -99,16 +98,33 @@ export function OrchardLayer({ map, visible, onToggle }: OrchardLayerProps) {
   const loadOrchards = async () => {
     if (!map || !layerGroupRef.current || isLoading) return
 
+    // Implement 3-second throttling for API calls
+    const now = Date.now()
+    const timeSinceLastCall = now - lastApiCallRef.current
+    if (timeSinceLastCall < 3000) {
+      // If less than 3 seconds since last call, schedule for later
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current)
+      }
+      loadingTimeoutRef.current = setTimeout(() => {
+        loadOrchards()
+      }, 3000 - timeSinceLastCall)
+      return
+    }
+
     const bounds = map.getBounds()
     const zoom = map.getZoom()
     
     // Don't load at very low zoom levels (performance)
     if (zoom < 12) {
-      toast.info('Zoomen Sie näher heran, um Obstgärten zu sehen')
+      // Clear existing orchards at low zoom
+      layerGroupRef.current.clearLayers()
+      setOrchardCount(0)
       return
     }
 
     setIsLoading(true)
+    lastApiCallRef.current = now
     
     try {
       // Clear existing orchards
@@ -120,11 +136,11 @@ export function OrchardLayer({ map, visible, onToggle }: OrchardLayerProps) {
       
       let addedCount = 0
       
-      // Add orchards to map
+      // Add orchards to map with zoom-dependent styling
       elements.forEach((element: OverpassElement) => {
-        const polygon = elementToPolygon(element)
-        if (polygon && layerGroupRef.current) {
-          layerGroupRef.current.addLayer(polygon)
+        const feature = elementToPolygon(element, zoom)
+        if (feature && layerGroupRef.current) {
+          layerGroupRef.current.addLayer(feature)
           addedCount++
         }
       })
@@ -158,6 +174,7 @@ export function OrchardLayer({ map, visible, onToggle }: OrchardLayerProps) {
 
   const handleRefresh = () => {
     lastBoundsRef.current = null // Force reload
+    lastApiCallRef.current = 0 // Reset throttling
     loadOrchards()
   }
 
