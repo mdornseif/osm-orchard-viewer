@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Layers, Check, MapPin, Satellite, Buildings, Globe } from '@phosphor-icons/react'
+import { Stack, Check, MapPin, Image, Buildings, Globe } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Badge } from '@/components/ui/badge'
@@ -13,7 +13,7 @@ interface LayerSelectorProps {
 
 const layerIcons = {
   osm: Globe,
-  satellite: Satellite,
+  satellite: Image,
   'nrw-orthophoto': MapPin,
   'nrw-cadastre': Buildings
 }
@@ -48,14 +48,14 @@ export function LayerSelector({ currentLayer, onLayerChange }: LayerSelectorProp
           size="sm"
           className="fixed bottom-4 right-4 z-[1000] map-control-shadow h-12 px-3 bg-card/95 backdrop-blur-sm"
         >
-          <Layers size={20} className="mr-2" />
+          <Stack size={20} className="mr-2" />
           <span className="text-sm font-medium">{currentLayerName}</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="bottom" className="h-[70vh] bg-card/95 backdrop-blur-sm">
         <SheetHeader className="pb-4">
           <SheetTitle className="flex items-center gap-2">
-            <Layers size={20} />
+            <Stack size={20} />
             Map Layers
           </SheetTitle>
           <p className="text-sm text-muted-foreground">

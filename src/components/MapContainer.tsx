@@ -24,7 +24,7 @@ interface MapContainerProps {
 export function MapContainer({ currentLayer, center, zoom, onMapReady }: MapContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [map, setMap] = useState<L.Map | null>(null)
-  const [currentTileLayer, setCurrentTileLayer] = useState<L.TileLayer | null>(null)
+  const [currentTileLayer, setCurrentTileLayer] = useState<L.TileLayer | L.TileLayer.WMS | null>(null)
 
   // Initialize map
   useEffect(() => {
@@ -39,20 +39,22 @@ export function MapContainer({ currentLayer, center, zoom, onMapReady }: MapCont
       })
 
       setMap(leafletMap)
-      onMapReady?.(leafletMap)
-    } catch (error) {
-      console.error('Failed to initialize map:', error)
-    }
-
-    return () => {
-      if (map) {
+      
+      // Add a small delay before calling onMapReady to ensure map is fully initialized
+      setTimeout(() => {
+        onMapReady?.(leafletMap)
+      }, 100)
+      
+      // Return cleanup function that has access to leafletMap
+      return () => {
         try {
-          map.remove()
+          leafletMap.remove()
         } catch (error) {
           console.error('Failed to remove map:', error)
         }
-        setMap(null)
       }
+    } catch (error) {
+      console.error('Failed to initialize map:', error)
     }
   }, [])
 
@@ -61,14 +63,21 @@ export function MapContainer({ currentLayer, center, zoom, onMapReady }: MapCont
     if (!map) return
 
     const layer = tileLayers.find(l => l.id === currentLayer)
-    if (!layer) return
+    if (!layer) {
+      console.warn(`Layer not found: ${currentLayer}`)
+      return
+    }
 
     // Remove current layer
     if (currentTileLayer) {
-      map.removeLayer(currentTileLayer)
+      try {
+        map.removeLayer(currentTileLayer)
+      } catch (error) {
+        console.warn('Failed to remove previous layer:', error)
+      }
     }
 
-    let tileLayer: L.TileLayer
+    let tileLayer: L.TileLayer | L.TileLayer.WMS
 
     try {
       // Handle WMS layers for NRW services
@@ -76,7 +85,7 @@ export function MapContainer({ currentLayer, center, zoom, onMapReady }: MapCont
         const baseUrl = layer.url.split('?')[0]
         const isOrthophoto = layer.url.includes('dop')
         
-        tileLayer = L.tileLayer.wms(baseUrl, {
+        const wmsOptions: any = {
           layers: isOrthophoto ? 'nw_dop_rgb' : 'adv_alkis_flurstuecke,adv_alkis_gebaeude',
           format: isOrthophoto ? 'image/jpeg' : 'image/png',
           transparent: !isOrthophoto,
@@ -84,7 +93,9 @@ export function MapContainer({ currentLayer, center, zoom, onMapReady }: MapCont
           maxZoom: layer.maxZoom,
           version: '1.1.1',
           crs: L.CRS.EPSG3857
-        })
+        }
+        
+        tileLayer = L.tileLayer.wms(baseUrl, wmsOptions)
       } else {
         // Handle standard tile layers
         const tileOptions: L.TileLayerOptions = {
@@ -92,8 +103,8 @@ export function MapContainer({ currentLayer, center, zoom, onMapReady }: MapCont
           maxZoom: layer.maxZoom
         }
         
-        // Only add subdomains if they exist
-        if (layer.subdomains && layer.subdomains.length > 0) {
+        // Only add subdomains if they exist and are not empty
+        if (layer.subdomains && Array.isArray(layer.subdomains) && layer.subdomains.length > 0) {
           tileOptions.subdomains = layer.subdomains
         }
         
@@ -104,6 +115,17 @@ export function MapContainer({ currentLayer, center, zoom, onMapReady }: MapCont
       setCurrentTileLayer(tileLayer)
     } catch (error) {
       console.error('Failed to add tile layer:', error)
+      // Try to add a fallback layer
+      try {
+        const fallbackLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors',
+          subdomains: ['a', 'b', 'c']
+        })
+        fallbackLayer.addTo(map)
+        setCurrentTileLayer(fallbackLayer)
+      } catch (fallbackError) {
+        console.error('Failed to add fallback layer:', fallbackError)
+      }
     }
   }, [map, currentLayer])
 

@@ -14,8 +14,8 @@ const DEFAULT_ZOOM = 10
 function App() {
   const [map, setMap] = useState<L.Map | null>(null)
   const [currentLayer, setCurrentLayer] = useKV('selected-layer', 'osm')
-  const [mapCenter, setMapCenter] = useKV('map-center', DEFAULT_CENTER)
-  const [mapZoom, setMapZoom] = useKV('map-zoom', DEFAULT_ZOOM)
+  const [mapCenter, setMapCenter] = useKV<[number, number]>('map-center', DEFAULT_CENTER)
+  const [mapZoom, setMapZoom] = useKV<number>('map-zoom', DEFAULT_ZOOM)
   
   // Use refs to prevent stale closures
   const mapCenterRef = useRef(mapCenter)
@@ -41,12 +41,12 @@ function App() {
     const currentCenter = mapCenterRef.current
     const currentZoom = mapZoomRef.current
     
-    if (Math.abs(newCenter[0] - currentCenter[0]) > 0.0001 || 
-        Math.abs(newCenter[1] - currentCenter[1]) > 0.0001) {
+    if (currentCenter && (Math.abs(newCenter[0] - currentCenter[0]) > 0.0001 || 
+        Math.abs(newCenter[1] - currentCenter[1]) > 0.0001)) {
       setMapCenter(newCenter)
     }
     
-    if (Math.abs(zoom - currentZoom) > 0.1) {
+    if (currentZoom !== undefined && Math.abs(zoom - currentZoom) > 0.1) {
       setMapZoom(zoom)
     }
   }, [map, setMapCenter, setMapZoom])
@@ -93,14 +93,14 @@ function App() {
   return (
     <div className="relative w-full h-screen bg-background">
       <MapContainer
-        currentLayer={currentLayer}
-        center={mapCenter}
-        zoom={mapZoom}
+        currentLayer={currentLayer || 'osm'}
+        center={mapCenter || DEFAULT_CENTER}
+        zoom={mapZoom || DEFAULT_ZOOM}
         onMapReady={setMap}
       />
       
       <QuickLayerSwitcher
-        currentLayer={currentLayer}
+        currentLayer={currentLayer || 'osm'}
         onLayerChange={setCurrentLayer}
       />
       
@@ -114,7 +114,7 @@ function App() {
       />
       
       <LayerSelector
-        currentLayer={currentLayer}
+        currentLayer={currentLayer || 'osm'}
         onLayerChange={setCurrentLayer}
       />
 

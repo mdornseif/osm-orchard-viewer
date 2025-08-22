@@ -1,5 +1,5 @@
 import React from 'react'
-import { Globe, Satellite, MapPin, Buildings } from '@phosphor-icons/react'
+import { Globe, Image, MapPin, Buildings } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { tileLayers } from '@/lib/tile-layers'
@@ -11,7 +11,7 @@ interface QuickLayerSwitcherProps {
 
 const layerIcons = {
   osm: Globe,
-  satellite: Satellite,
+  satellite: Image,
   'nrw-orthophoto': MapPin,
   'nrw-cadastre': Buildings
 }
