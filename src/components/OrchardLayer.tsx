@@ -73,11 +73,19 @@ export function OrchardLayer({ map, visible, onToggle }: OrchardLayerProps) {
   }, [map, visible])
 
   const boundsOverlapSignificantly = (bounds1: L.LatLngBounds, bounds2: L.LatLngBounds): boolean => {
-    const intersection = bounds1.intersect(bounds2)
-    if (!intersection) return false
+    // Check if bounds intersect at all
+    if (!bounds1.intersects(bounds2)) return false
     
-    const intersectionArea = (intersection.getNorth() - intersection.getSouth()) * 
-                            (intersection.getEast() - intersection.getWest())
+    // Calculate intersection manually
+    const north = Math.min(bounds1.getNorth(), bounds2.getNorth())
+    const south = Math.max(bounds1.getSouth(), bounds2.getSouth())
+    const east = Math.min(bounds1.getEast(), bounds2.getEast())
+    const west = Math.max(bounds1.getWest(), bounds2.getWest())
+    
+    // If no valid intersection, return false
+    if (north <= south || east <= west) return false
+    
+    const intersectionArea = (north - south) * (east - west)
     const bounds1Area = (bounds1.getNorth() - bounds1.getSouth()) * 
                        (bounds1.getEast() - bounds1.getWest())
     
