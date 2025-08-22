@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { queryOrchards, elementToPolygon, OverpassElement } from '@/lib/overpass'
 import { toast } from 'sonner'
 
@@ -11,7 +9,6 @@ interface OrchardLayerProps {
 
 export function OrchardLayer({ map }: OrchardLayerProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [orchardCount, setOrchardCount] = useState(0)
   const layerGroupRef = useRef<L.LayerGroup | null>(null)
   const lastBoundsRef = useRef<L.LatLngBounds | null>(null)
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -129,7 +126,6 @@ export function OrchardLayer({ map }: OrchardLayerProps) {
     if (zoom < 10) {
       // Clear existing orchards at very low zoom
       layerGroupRef.current.clearLayers()
-      setOrchardCount(0)
       return
     }
 
@@ -164,7 +160,6 @@ export function OrchardLayer({ map }: OrchardLayerProps) {
         })
       }
 
-      setOrchardCount(addedCount)
       lastBoundsRef.current = bounds
 
       if (addedCount > 0) {
@@ -185,48 +180,10 @@ export function OrchardLayer({ map }: OrchardLayerProps) {
       }
       
       toast.error(errorMessage)
-      setOrchardCount(0)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleRefresh = () => {
-    lastBoundsRef.current = null // Force reload
-    lastApiCallRef.current = 0 // Reset throttling
-    loadOrchards()
-  }
-
-  return (
-    <div className="absolute top-20 left-4 z-[1000] flex flex-col gap-2">
-      <div className="bg-card/95 backdrop-blur-sm border border-border rounded-lg p-3 shadow-lg max-w-[200px]">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isLoading}
-            className="px-2"
-          >
-            {isLoading ? '⟳' : '↻'}
-          </Button>
-        </div>
-        
-        <div className="mt-2 flex items-center gap-2">
-          <Badge variant="secondary" className="text-xs">
-            {orchardCount}
-          </Badge>
-          {isLoading && (
-            <Badge variant="outline" className="text-xs">
-              Laden...
-            </Badge>
-          )}
-        </div>
-        
-        <div className="mt-2 text-xs text-muted-foreground">
-          Obstgärten (OSM)
-        </div>
-      </div>
-    </div>
-  )
+  return null
 }
