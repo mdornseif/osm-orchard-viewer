@@ -9,12 +9,12 @@ import { LocationButton } from '@/components/LocationButton'
 import { OrchardLayer } from '@/components/OrchardLayer'
 import { Toaster } from '@/components/ui/sonner'
 
-const DEFAULT_CENTER: [number, number] = [51.4818, 7.2162] // Dortmund, NRW
-const DEFAULT_ZOOM = 10
+const DEFAULT_CENTER: [number, number] = [50.9333, 7.2833] // Overath, NRW
+const DEFAULT_ZOOM = 8
 
 function App() {
   const [map, setMap] = useState<L.Map | null>(null)
-  const [currentLayer, setCurrentLayer] = useKV('selected-layer', 'osm')
+  const [currentLayer, setCurrentLayer] = useKV('selected-layer', 'orto')
   const [mapCenter, setMapCenter] = useKV<[number, number]>('map-center', DEFAULT_CENTER)
   const [mapZoom, setMapZoom] = useKV<number>('map-zoom', DEFAULT_ZOOM)
   
@@ -94,14 +94,14 @@ function App() {
   return (
     <div className="relative w-full h-screen bg-background">
       <MapContainer
-        currentLayer={currentLayer || 'osm'}
+        currentLayer={currentLayer || 'orto'}
         center={mapCenter || DEFAULT_CENTER}
         zoom={mapZoom || DEFAULT_ZOOM}
         onMapReady={setMap}
       />
       
       <QuickLayerSwitcher
-        currentLayer={currentLayer || 'osm'}
+        currentLayer={currentLayer || 'orto'}
         onLayerChange={setCurrentLayer}
       />
       
@@ -115,7 +115,7 @@ function App() {
       />
       
       <LayerSelector
-        currentLayer={currentLayer || 'osm'}
+        currentLayer={currentLayer || 'orto'}
         onLayerChange={setCurrentLayer}
       />
 
