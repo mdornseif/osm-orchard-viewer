@@ -26,13 +26,9 @@ export function OrchardLayer({ map, visible, onToggle }: OrchardLayerProps) {
       layerGroupRef.current = L.layerGroup()
     }
 
-    if (visible) {
-      layerGroupRef.current.addTo(map)
-      loadOrchards()
-    } else {
-      layerGroupRef.current.remove()
-      setOrchardCount(0)
-    }
+    // Always add to map and load orchards
+    layerGroupRef.current.addTo(map)
+    loadOrchards()
 
     return () => {
       if (layerGroupRef.current) {
@@ -42,7 +38,7 @@ export function OrchardLayer({ map, visible, onToggle }: OrchardLayerProps) {
         clearTimeout(loadingTimeoutRef.current)
       }
     }
-  }, [map, visible])
+  }, [map])
 
   // Listen for map movement to reload orchards
   useEffect(() => {
@@ -159,46 +155,30 @@ export function OrchardLayer({ map, visible, onToggle }: OrchardLayerProps) {
       <div className="bg-card/95 backdrop-blur-sm border border-border rounded-lg p-3 shadow-lg max-w-[200px]">
         <div className="flex items-center gap-2">
           <Button
-            variant={visible ? "default" : "outline"}
+            variant="outline"
             size="sm"
-            onClick={onToggle}
+            onClick={handleRefresh}
             disabled={isLoading}
-            className="text-xs"
+            className="px-2"
           >
-            {visible ? 'Obstgärten aus' : 'Obstgärten an'}
+            {isLoading ? '⟳' : '↻'}
           </Button>
-          
-          {visible && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={isLoading}
-              className="px-2"
-            >
-              {isLoading ? '⟳' : '↻'}
-            </Button>
+        </div>
+        
+        <div className="mt-2 flex items-center gap-2">
+          <Badge variant="secondary" className="text-xs">
+            {orchardCount}
+          </Badge>
+          {isLoading && (
+            <Badge variant="outline" className="text-xs">
+              Laden...
+            </Badge>
           )}
         </div>
         
-        {visible && (
-          <div className="mt-2 flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs">
-              {orchardCount}
-            </Badge>
-            {isLoading && (
-              <Badge variant="outline" className="text-xs">
-                Laden...
-              </Badge>
-            )}
-          </div>
-        )}
-        
-        {visible && (
-          <div className="mt-2 text-xs text-muted-foreground">
-            OSM via Overpass API
-          </div>
-        )}
+        <div className="mt-2 text-xs text-muted-foreground">
+          Obstgärten (OSM)
+        </div>
       </div>
     </div>
   )
