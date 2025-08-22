@@ -6,6 +6,7 @@ import { LayerSelector } from '@/components/LayerSelector'
 import { QuickLayerSwitcher } from '@/components/QuickLayerSwitcher'
 import { ZoomControls } from '@/components/ZoomControls'
 import { LocationButton } from '@/components/LocationButton'
+import { OrchardLayer } from '@/components/OrchardLayer'
 import { Toaster } from '@/components/ui/sonner'
 
 const DEFAULT_CENTER: [number, number] = [51.4818, 7.2162] // Dortmund, NRW
@@ -16,6 +17,7 @@ function App() {
   const [currentLayer, setCurrentLayer] = useKV('selected-layer', 'osm')
   const [mapCenter, setMapCenter] = useKV<[number, number]>('map-center', DEFAULT_CENTER)
   const [mapZoom, setMapZoom] = useKV<number>('map-zoom', DEFAULT_ZOOM)
+  const [showOrchards, setShowOrchards] = useKV('show-orchards', false)
   
   // Use refs to prevent stale closures
   const mapCenterRef = useRef(mapCenter)
@@ -116,6 +118,12 @@ function App() {
       <LayerSelector
         currentLayer={currentLayer || 'osm'}
         onLayerChange={setCurrentLayer}
+      />
+
+      <OrchardLayer
+        map={map}
+        visible={showOrchards}
+        onToggle={() => setShowOrchards(!showOrchards)}
       />
 
       <Toaster />
