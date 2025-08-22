@@ -103,8 +103,8 @@ export function elementToPolygon(element: OverpassElement, zoom: number): L.Poly
     
     popupContent += `<div class="text-xs text-gray-500 mt-2 border-t pt-1">OSM ID: ${element.id}</div>`
 
-    // Above zoom level 16, show as points
-    if (zoom > 16) {
+    // Below zoom level 14, show as points to avoid tiny areas
+    if (zoom < 14) {
       // Calculate center point of the orchard
       const lats = element.geometry.map(coord => coord.lat)
       const lons = element.geometry.map(coord => coord.lon)
@@ -127,7 +127,7 @@ export function elementToPolygon(element: OverpassElement, zoom: number): L.Poly
 
       return marker
     } else {
-      // Show as polygon at lower zoom levels
+      // Show as polygon at higher zoom levels where areas are visible
       if (element.geometry.length < 3) {
         return null
       }

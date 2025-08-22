@@ -59,12 +59,22 @@ export function OrchardLayer({ map }: OrchardLayerProps) {
       }
     }
 
+    const handleZoomEnd = () => {
+      // Always reload on zoom to switch between markers and polygons
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current)
+      }
+      loadingTimeoutRef.current = setTimeout(() => {
+        loadOrchards()
+      }, 200)
+    }
+
     map.on('moveend', handleMoveEnd)
-    map.on('zoomend', handleMoveEnd)
+    map.on('zoomend', handleZoomEnd)
 
     return () => {
       map.off('moveend', handleMoveEnd)
-      map.off('zoomend', handleMoveEnd)
+      map.off('zoomend', handleZoomEnd)
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current)
       }
@@ -116,8 +126,8 @@ export function OrchardLayer({ map }: OrchardLayerProps) {
     const zoom = map.getZoom()
     
     // Don't load at very low zoom levels (performance)
-    if (zoom < 12) {
-      // Clear existing orchards at low zoom
+    if (zoom < 10) {
+      // Clear existing orchards at very low zoom
       layerGroupRef.current.clearLayers()
       setOrchardCount(0)
       return
