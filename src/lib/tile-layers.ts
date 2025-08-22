@@ -18,14 +18,14 @@ export const tileLayers: TileLayer[] = [
   },
   {
     id: 'satellite',
-    name: 'Satellite',
+    name: 'Satellit',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
     maxZoom: 18
   },
   {
     id: 'nrw-orthophoto',
-    name: 'NRW Orthophoto',
+    name: 'NRW Orthofoto',
     url: 'https://www.wms.nrw.de/geobasis/wms_nw_dop?FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&LAYERS=nw_dop_rgb&STYLES=&SRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}',
     attribution: '&copy; <a href="https://www.bezreg-koeln.nrw.de/geobasis-nrw">Geobasis NRW</a>',
     maxZoom: 20

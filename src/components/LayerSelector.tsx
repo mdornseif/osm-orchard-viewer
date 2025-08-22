@@ -19,16 +19,16 @@ const layerIcons = {
 }
 
 const layerDescriptions = {
-  osm: 'Detailed street map with roads, POIs, and labels',
-  satellite: 'High-resolution satellite and aerial imagery',
-  'nrw-orthophoto': 'Official NRW aerial photography with precise details',
-  'nrw-cadastre': 'Property boundaries, parcels, and building outlines'
+  osm: 'Detaillierte Straßenkarte mit Straßen, POIs und Beschriftungen',
+  satellite: 'Hochauflösende Satelliten- und Luftbilder',
+  'nrw-orthophoto': 'Offizielle NRW-Luftbildfotografie mit präzisen Details',
+  'nrw-cadastre': 'Grundstücksgrenzen, Parzellen und Gebäudegrundrisse'
 }
 
 const layerCategories = {
-  'Street Maps': ['osm'],
-  'Aerial & Satellite': ['satellite', 'nrw-orthophoto'],
-  'Cadastral & Property': ['nrw-cadastre']
+  'Straßenkarten': ['osm'],
+  'Luft- & Satellitenbilder': ['satellite', 'nrw-orthophoto'],
+  'Kataster & Eigentum': ['nrw-cadastre']
 }
 
 export function LayerSelector({ currentLayer, onLayerChange }: LayerSelectorProps) {
@@ -56,10 +56,10 @@ export function LayerSelector({ currentLayer, onLayerChange }: LayerSelectorProp
         <SheetHeader className="pb-4">
           <SheetTitle className="flex items-center gap-2">
             <Stack size={20} />
-            Map Layers
+            Kartenebenen
           </SheetTitle>
           <p className="text-sm text-muted-foreground">
-            Choose your preferred map display style
+            Wählen Sie Ihren bevorzugten Kartendarstellungsstil
           </p>
         </SheetHeader>
         
@@ -106,7 +106,7 @@ export function LayerSelector({ currentLayer, onLayerChange }: LayerSelectorProp
                                 <div className="flex items-center gap-1 text-primary">
                                   <Check size={16} weight="bold" />
                                   <Badge variant="default" className="text-xs">
-                                    Active
+                                    Aktiv
                                   </Badge>
                                 </div>
                               )}
@@ -117,10 +117,10 @@ export function LayerSelector({ currentLayer, onLayerChange }: LayerSelectorProp
                             </p>
                             
                             <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                              <span>Max zoom: {layer.maxZoom}</span>
+                              <span>Max. Zoom: {layer.maxZoom}</span>
                               {layer.id.includes('nrw') && (
                                 <Badge variant="outline" className="text-xs px-1.5 py-0.5">
-                                  NRW Official
+                                  NRW Offiziell
                                 </Badge>
                               )}
                             </div>
@@ -137,7 +137,7 @@ export function LayerSelector({ currentLayer, onLayerChange }: LayerSelectorProp
         
         <div className="pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground text-center">
-            Tap any layer to switch your map view instantly
+            Tippen Sie auf eine Ebene, um Ihre Kartenansicht sofort zu wechseln
           </p>
         </div>
       </SheetContent>

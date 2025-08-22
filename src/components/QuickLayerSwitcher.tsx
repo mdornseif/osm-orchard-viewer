@@ -12,9 +12,9 @@ const quickLayers = ['osm', 'satellite', 'nrw-orthophoto', 'nrw-cadastre']
 // Short display names for the buttons
 const layerDisplayNames = {
   osm: 'OSM',
-  satellite: 'Satellite',
+  satellite: 'Satellit',
   'nrw-orthophoto': 'Ortho',
-  'nrw-cadastre': 'Cadastre'
+  'nrw-cadastre': 'Kataster'
 }
 
 export function QuickLayerSwitcher({ currentLayer, onLayerChange }: QuickLayerSwitcherProps) {
