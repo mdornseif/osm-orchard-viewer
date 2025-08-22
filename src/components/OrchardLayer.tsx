@@ -73,7 +73,10 @@ export function OrchardLayer({ map, visible, onToggle }: OrchardLayerProps) {
   }, [map, visible])
 
   const boundsOverlapSignificantly = (bounds1: L.LatLngBounds, bounds2: L.LatLngBounds): boolean => {
-    // Check if bounds intersect at all
+    // Validate inputs
+    if (!bounds1 || !bounds2 || typeof bounds1.intersects !== 'function') return false
+    
+    // Check if bounds intersects at all (note: method is 'intersects', not 'intersect')
     if (!bounds1.intersects(bounds2)) return false
     
     // Calculate intersection manually
