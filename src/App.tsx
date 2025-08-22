@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import L from 'leaflet'
 import { useKV } from '@github/spark/hooks'
 import { MapContainer } from '@/components/MapContainer'
@@ -16,16 +16,43 @@ function App() {
   const [currentLayer, setCurrentLayer] = useKV('selected-layer', 'osm')
   const [mapCenter, setMapCenter] = useKV('map-center', DEFAULT_CENTER)
   const [mapZoom, setMapZoom] = useKV('map-zoom', DEFAULT_ZOOM)
+  
+  // Use refs to prevent stale closures
+  const mapCenterRef = useRef(mapCenter)
+  const mapZoomRef = useRef(mapZoom)
+  
+  // Update refs when values change
+  useEffect(() => {
+    mapCenterRef.current = mapCenter
+  }, [mapCenter])
+  
+  useEffect(() => {
+    mapZoomRef.current = mapZoom
+  }, [mapZoom])
+
+  const handleMoveEnd = useCallback(() => {
+    if (!map) return
+    
+    const center = map.getCenter()
+    const zoom = map.getZoom()
+    const newCenter: [number, number] = [center.lat, center.lng]
+    
+    // Only update if values actually changed to prevent infinite loops
+    const currentCenter = mapCenterRef.current
+    const currentZoom = mapZoomRef.current
+    
+    if (Math.abs(newCenter[0] - currentCenter[0]) > 0.0001 || 
+        Math.abs(newCenter[1] - currentCenter[1]) > 0.0001) {
+      setMapCenter(newCenter)
+    }
+    
+    if (Math.abs(zoom - currentZoom) > 0.1) {
+      setMapZoom(zoom)
+    }
+  }, [map, setMapCenter, setMapZoom])
 
   useEffect(() => {
     if (!map) return
-
-    const handleMoveEnd = () => {
-      const center = map.getCenter()
-      const zoom = map.getZoom()
-      setMapCenter([center.lat, center.lng])
-      setMapZoom(zoom)
-    }
 
     map.on('moveend', handleMoveEnd)
     map.on('zoomend', handleMoveEnd)
@@ -34,7 +61,7 @@ function App() {
       map.off('moveend', handleMoveEnd)
       map.off('zoomend', handleMoveEnd)
     }
-  }, [map])
+  }, [map, handleMoveEnd])
 
   const handleZoomIn = () => {
     if (map) {
