@@ -34,7 +34,7 @@ function App() {
       map.off('moveend', handleMoveEnd)
       map.off('zoomend', handleMoveEnd)
     }
-  }, [map])
+  }, [map, setMapCenter, setMapZoom])
 
   const handleZoomIn = () => {
     if (map) {
