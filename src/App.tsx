@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import L from 'leaflet'
 import { useKV } from '@github/spark/hooks'
-import { MapComponent } from '@/components/MapComponent'
+import { MapContainer } from '@/components/MapContainer'
 import { LayerSelector } from '@/components/LayerSelector'
 import { ZoomControls } from '@/components/ZoomControls'
 import { LocationButton } from '@/components/LocationButton'
@@ -64,7 +64,7 @@ function App() {
 
   return (
     <div className="relative w-full h-screen bg-background">
-      <MapComponent
+      <MapContainer
         currentLayer={currentLayer}
         center={mapCenter}
         zoom={mapZoom}
