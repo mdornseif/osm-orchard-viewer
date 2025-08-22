@@ -137,23 +137,32 @@ export function OrchardLayer({ map }: OrchardLayerProps) {
     lastApiCallRef.current = now
     
     try {
-      // Clear existing orchards
-      layerGroupRef.current.clearLayers()
-      setOrchardCount(0)
-      
-      // Query Overpass API
+      // Query Overpass API first, keep existing layers until new ones are ready
       const elements = await queryOrchards(bounds)
       
+      // Create a temporary layer group for new features
+      const tempLayerGroup = L.layerGroup()
       let addedCount = 0
       
-      // Add orchards to map with zoom-dependent styling
+      // Add orchards to temporary layer group with zoom-dependent styling
       elements.forEach((element: OverpassElement) => {
         const feature = elementToPolygon(element, zoom)
-        if (feature && layerGroupRef.current) {
-          layerGroupRef.current.addLayer(feature)
+        if (feature) {
+          tempLayerGroup.addLayer(feature)
           addedCount++
         }
       })
+
+      // Only update the map once all new features are ready
+      if (layerGroupRef.current) {
+        // Clear old layers and add new ones atomically
+        layerGroupRef.current.clearLayers()
+        tempLayerGroup.eachLayer(layer => {
+          if (layerGroupRef.current) {
+            layerGroupRef.current.addLayer(layer)
+          }
+        })
+      }
 
       setOrchardCount(addedCount)
       lastBoundsRef.current = bounds
