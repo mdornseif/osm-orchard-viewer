@@ -87,11 +87,17 @@ export function MapContainer({ currentLayer, center, zoom, onMapReady }: MapCont
         })
       } else {
         // Handle standard tile layers
-        tileLayer = L.tileLayer(layer.url, {
+        const tileOptions: L.TileLayerOptions = {
           attribution: layer.attribution,
-          maxZoom: layer.maxZoom,
-          subdomains: layer.subdomains
-        })
+          maxZoom: layer.maxZoom
+        }
+        
+        // Only add subdomains if they exist
+        if (layer.subdomains && layer.subdomains.length > 0) {
+          tileOptions.subdomains = layer.subdomains
+        }
+        
+        tileLayer = L.tileLayer(layer.url, tileOptions)
       }
 
       tileLayer.addTo(map)
