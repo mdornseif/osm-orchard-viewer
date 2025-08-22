@@ -57,7 +57,7 @@ export function LocationButton({ onLocationFound }: LocationButtonProps) {
     <Button
       variant="secondary"
       size="icon"
-      className={`fixed right-4 top-20 z-[1000] h-12 w-12 map-control-shadow ${
+      className={`fixed right-4 top-20 z-[1000] h-12 w-12 map-control-shadow bg-card/95 backdrop-blur-sm ${
         hasLocation ? 'bg-accent text-accent-foreground' : ''
       } ${isLocating ? 'animate-pulse' : ''}`}
       onClick={requestLocation}

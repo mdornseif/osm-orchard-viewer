@@ -9,11 +9,11 @@ interface ZoomControlsProps {
 
 export function ZoomControls({ onZoomIn, onZoomOut }: ZoomControlsProps) {
   return (
-    <div className="fixed left-4 bottom-4 z-[1000] flex flex-col gap-2">
+    <div className="fixed left-4 bottom-20 z-[1000] flex flex-col gap-2">
       <Button
         variant="secondary"
         size="icon"
-        className="h-12 w-12 map-control-shadow"
+        className="h-12 w-12 map-control-shadow bg-card/95 backdrop-blur-sm"
         onClick={onZoomIn}
       >
         <Plus size={20} />
@@ -21,7 +21,7 @@ export function ZoomControls({ onZoomIn, onZoomOut }: ZoomControlsProps) {
       <Button
         variant="secondary"
         size="icon"
-        className="h-12 w-12 map-control-shadow"
+        className="h-12 w-12 map-control-shadow bg-card/95 backdrop-blur-sm"
         onClick={onZoomOut}
       >
         <Minus size={20} />

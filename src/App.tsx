@@ -3,6 +3,7 @@ import L from 'leaflet'
 import { useKV } from '@github/spark/hooks'
 import { MapContainer } from '@/components/MapContainer'
 import { LayerSelector } from '@/components/LayerSelector'
+import { QuickLayerSwitcher } from '@/components/QuickLayerSwitcher'
 import { ZoomControls } from '@/components/ZoomControls'
 import { LocationButton } from '@/components/LocationButton'
 import { Toaster } from '@/components/ui/sonner'
@@ -71,6 +72,11 @@ function App() {
         onMapReady={setMap}
       />
       
+      <QuickLayerSwitcher
+        currentLayer={currentLayer}
+        onLayerChange={setCurrentLayer}
+      />
+      
       <ZoomControls
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
@@ -84,8 +90,6 @@ function App() {
         currentLayer={currentLayer}
         onLayerChange={setCurrentLayer}
       />
-
-
 
       <Toaster />
     </div>
